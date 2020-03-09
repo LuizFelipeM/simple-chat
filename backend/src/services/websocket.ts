@@ -34,7 +34,6 @@ export const setupWebSocket = (server: http.Server) => {
                 timstamp: string
             }
         }) => {
-            console.log(data)
             io.to(roomPrefix + data.chat_id).emit('message', data);
         })
 

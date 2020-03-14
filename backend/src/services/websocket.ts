@@ -4,6 +4,8 @@ import http from 'http'
 let io: socketio.Server;
 
 export const setupWebSocket = (server: http.Server) => {
+    const room_prefix = process.env.ROOM_PREFIX ?? '';
+
     io = socketio(server);
 
     io.on('connection', (socket: socketio.Socket) => {
@@ -12,13 +14,11 @@ export const setupWebSocket = (server: http.Server) => {
             console.log("Socket desconectado", socket.id)
         })
 
-        const roomPrefix = 'chat_';
-
         socket.on('join_in_room', (chat_id) => {
-            if(!Object.values(socket.rooms)[0].includes(roomPrefix))
+            if(!Object.values(socket.rooms)[0].includes(room_prefix))
                 socket.leaveAll();
 
-            const chat_room = roomPrefix + chat_id;
+            const chat_room = room_prefix + chat_id;
 
             socket.join(chat_room, (err: any) => {
                 if(err)
@@ -34,7 +34,7 @@ export const setupWebSocket = (server: http.Server) => {
                 timstamp: string
             }
         }) => {
-            io.to(roomPrefix + data.chat_id).emit('message', data);
+            io.to(room_prefix + data.chat_id).emit('message', data);
         })
 
     })

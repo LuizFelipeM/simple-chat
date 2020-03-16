@@ -6,8 +6,6 @@ import http from 'http'
 import routes from './routes'
 import { setupWebSocket } from './services/websocket'
 
-const PORT = 8080
-
 const app = express();
 const server = new http.Server(app);
 
@@ -18,4 +16,4 @@ app.use(express.json())
 
 app.use(routes)
 
-server.listen(PORT);
+server.listen(process.env.PORT);

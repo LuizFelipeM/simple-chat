@@ -1,4 +1,4 @@
-import StatusCodeEnum from "./StatusCodeEnum";
+import StatusCodeEnum from "../../Enums/StatusCodeEnum";
 
 interface IReturn {
     status: StatusCodeEnum;

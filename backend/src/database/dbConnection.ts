@@ -3,6 +3,6 @@ import Knex from "knex";
 
 // const config = process.env.NODE_ENV === 'dev' ? development : staging
 
-const dbConnection = Knex(development);
+const knex = Knex(development);
 
-export default dbConnection;
+export default knex;

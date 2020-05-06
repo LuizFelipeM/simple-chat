@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<any> {
     return knex.schema.createTable(tableName, (table: Knex.CreateTableBuilder) => {
         table.bigIncrements('id').primary();
         table.string('name', 50).notNullable();
-        table.string('email', 100).notNullable();
+        table.string('email', 100).notNullable().unique();
         table.text('password').notNullable();
         table.text('img_url');
     })

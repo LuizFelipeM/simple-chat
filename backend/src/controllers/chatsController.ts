@@ -12,7 +12,9 @@ const chatsController = {
 
     async createNewChat(req: Request, res: Response): Promise<Response> {
         const { name, description, imgUrl } = req.body;
-        const resp = await chatServ.createNewChat(name, description, imgUrl);
+        const { userid } = req.headers;
+
+        const resp = await chatServ.createNewChatAndAssigntoCreator(Number(userid), name, description, imgUrl);
 
         return res.status(resp.statusCode === 1 ? 400 : 200).json(resp);
     },

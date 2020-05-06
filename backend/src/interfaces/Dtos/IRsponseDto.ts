@@ -1,7 +1,7 @@
-import StatusCodeEnum from "../../controllers/interfaces/StatusCodeEnum";
+import StatusCodeEnum from "../../Enums/StatusCodeEnum";
 
-export default interface IResponseDto {
+export default interface IResponseDto<T> {
     statusCode: StatusCodeEnum,
     message?: string,
-    data?: any,
+    data?: T,
 }

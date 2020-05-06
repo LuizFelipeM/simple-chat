@@ -6,9 +6,10 @@ import userService from "./services/userService";
 import redisService from "./services/redisService";
 import chatsRepository from "./repositories/chatsRepository";
 import usersRepository from "./repositories/usersRepository";
+import usersChatsRepository from "./repositories/usersChatsRepository";
 
-const chatServ = chatService(chatsRepository);
 const userServ = userService(usersRepository);
+const chatServ = chatService(usersRepository, chatsRepository, usersChatsRepository);
 
 function Bootstrapper(
     server: http.Server

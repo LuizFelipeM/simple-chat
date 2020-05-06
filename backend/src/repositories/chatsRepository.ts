@@ -1,13 +1,12 @@
-import IChatsRepository from "../interfaces/IChatsRepository";
-import dbConnection from "../database/dbConnection";
-import { ResponseDtoGen } from "../utils/helper";
+import IChatsRepository from "../interfaces/repositories/IChatsRepository";
+import knex from "../database/dbConnection";
 
 const tableName = 'chats'
 
 const chatsRepository: IChatsRepository = {
     async getByEmail(email: string) {
         try {
-            return await dbConnection(tableName)
+            return await knex(tableName)
                 .select('*')
                 .from(tableName)
                 .whereIn('id', function() {
@@ -16,8 +15,8 @@ const chatsRepository: IChatsRepository = {
                         .leftJoin('users', 'users_chats.user_id', 'users.id')
                         .where('users.email', email)
                 })
-        } catch(exception) {
-            return ResponseDtoGen.error(`Error on getByEmail - exception: ${exception}`);
+        } catch(ex) {
+            throw ex;
         }
     },
 
@@ -27,28 +26,26 @@ const chatsRepository: IChatsRepository = {
         imgUrl?: string
     ) {
         try {
-            await dbConnection(tableName)
+            return (await knex(tableName)
                 .insert({
                     name,
                     description,
                     img_url: imgUrl
                 })
-
-            return ResponseDtoGen.success();
-        } catch(exception) {
-            return ResponseDtoGen.error(`Error on createNewChat - exception: ${exception}`);
+                .returning('*'))[0];
+        } catch(ex) {
+            throw ex;
         }
     },
 
     async deleteChat(id: number) {
         try {
-            await dbConnection(tableName)
-                .where('id', id)
+            return (await knex(tableName)
+                .where({ id })
                 .del()
-
-            return ResponseDtoGen.success()
-        } catch(exception) {
-            return ResponseDtoGen.error(`Error on deleteChat - exception: ${exception}`);
+                .returning('*'))[0]
+        } catch(ex) {
+            throw ex;
         }
     }
 }

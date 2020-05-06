@@ -1,45 +1,41 @@
-import IUserRepository from "../interfaces/IUsersRepository";
-import dbConnection from "../database/dbConnection";
-import { ResponseDtoGen } from "../utils/helper";
+import IUsersRepository from "../interfaces/repositories/IUsersRepository";
+import knex from "../database/dbConnection";
 
 const tableName = 'users'
 
-const usersRepository: IUserRepository = {
-    async getUserInfoByEmail(email: string) {
+const usersRepository: IUsersRepository = {
+    async findUserInfoByEmail(email: string) {
         try {
-            return (await dbConnection(tableName)
+            return (await knex(tableName)
                 .select('name', 'email', 'img_url')
-                .where('email', email))[0];
-        } catch(exception) {
-            return ResponseDtoGen.error(`Error on getUserInfoByEmail - exception: ${exception}`);
+                .where({ email }))[0];
+        } catch(ex) {
+            throw ex;
         }
     },
 
-    async createUser(name: string, email: string, password: string, imgUrl?: string) {
+    async createUser(name: string, email: string, password: string, img_url?: string) {
         try {
-            await dbConnection(tableName)
+            return await knex(tableName)
                 .insert({
                     name,
                     email,
                     password,
-                    img_url: imgUrl
+                    img_url
                 });
-
-            return ResponseDtoGen.success();
-        } catch(exception) {
-            return ResponseDtoGen.error(`Error on createUser - exception: ${exception}`);
+        } catch(ex) {
+            throw ex;
         }
     },
 
     async deleteUser(email: string) {
         try {
-            await dbConnection(tableName)
-                .where('email', email)
-                .del();
-
-            return ResponseDtoGen.success();
-        } catch(exception) {
-            return ResponseDtoGen.error(`Error on deleteUser - exception: ${exception}`);
+            return (await knex(tableName)
+                .where({ email })
+                .del()
+                .returning('*'))[0];
+        } catch(ex) {
+            throw ex;
         }
     },
 }

@@ -1,44 +1,26 @@
 import { Router } from 'express';
-import userController from './controllers/users.controller';
-import userChatsController from './controllers/userChats.controller';
-import chatController from './controllers/chats.controller';
-import messagesController from './controllers/messages.controller';
-import withAuth from './controllers/utils/authMiddleware';
+import redisController from './controllers/redisController';
+import chatsController from './controllers/chatsController';
+import usersController from './controllers/usersController';
+import chatsContentsController from './controllers/chatsContentsController';
 
-/**
- * App Bootstrapper
- */
+const routes = Router();
 
- const user = new userController();
- const chat = new chatController();
- const userChats = new userChatsController();
- const messages = new messagesController();
+routes.get('/redis/list', redisController.listAll);
+routes.get('/redis/message', redisController.listMessages);
+routes.post('/redis/cache', redisController.storeCache);
+routes.post('/redis/message', redisController.storeMessage);
 
-const routes: Router = Router()
+routes.get('/chats', chatsController.listChatsByEmail);
+routes.post('/chats', chatsController.createNewChat);
+routes.delete('/chats/:id', chatsController.deleteChat);
 
-// User Routes
-routes.get('/users', [user.listUser, user.findUser] )
-routes.post('/users/auth', user.authUser)
-routes.post('/users', user.createUser)
-// routes.put('/users', userController.update)
-// routes.delete('/users', userController.destroy)
+routes.get('/users', usersController.getUserInfo);
+routes.post('/users', usersController.createUser);
+routes.delete('/users/:email', usersController.deleteChat);
 
-// User Chats
-routes.get('/users/chats', [withAuth, userChats.list, userChats.find] )
-routes.post('/users/chats', [withAuth, userChats.create])
-// routes.put('/users/chats', userChats.update)
-// routes.delete('/users/chats', userChats.remove)
-
-// Chats Routes
-routes.get('/chats', [withAuth, chat.list, chat.find] )
-routes.post('/chats', [withAuth, chat.create])
-// routes.put('/chats', chat.update)
-// routes.delete('/chats', chat.remove)
-
-// Messages Routes
-routes.get('/chats/messages', [withAuth, messages.list, messages.find] )
-routes.post('/chats/messages', [withAuth, messages.create])
-routes.patch('/chats/messages', [withAuth, messages.update])
-// routes.delete('/chats/messages', messages.remoev)
+routes.get('/chats/contents', chatsContentsController.getAllMessagesFromChat);
+routes.post('/chats/contents', chatsContentsController.createChatContentMessages);
+routes.patch('/chats/contents', chatsContentsController.insertMessagesChatContent);
 
 export default routes;

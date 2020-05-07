@@ -1,6 +1,6 @@
-import IMessage from "../Dtos/IMessageDto";
+import IMessageDto from "../Dtos/IMessageDto";
 
 export default interface IChatsContents {
     chat_id: number,
-    messages: IMessage[]
+    messages: IMessageDto[]
 }

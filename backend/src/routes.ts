@@ -2,6 +2,7 @@ import { Router } from 'express';
 import redisController from './controllers/redisController';
 import chatsController from './controllers/chatsController';
 import usersController from './controllers/usersController';
+import chatsContentsController from './controllers/chatsContentsController';
 
 const routes = Router();
 
@@ -17,5 +18,9 @@ routes.delete('/chats/:id', chatsController.deleteChat);
 routes.get('/users', usersController.getUserInfo);
 routes.post('/users', usersController.createUser);
 routes.delete('/users/:email', usersController.deleteChat);
+
+routes.get('/chats/contents', chatsContentsController.getAllMessagesFromChat);
+routes.post('/chats/contents', chatsContentsController.createChatContentMessages);
+routes.patch('/chats/contents', chatsContentsController.insertMessagesChatContent);
 
 export default routes;

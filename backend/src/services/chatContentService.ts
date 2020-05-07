@@ -11,7 +11,7 @@ function chatContentService(chatsContentsRepo: IChatsContentsRepository): IChatC
             try {
                 const messages = await chatsContentsRepo.getMesagesFromChat(chatId);
                 
-                return RespGen.success(messages);
+                return RespGen.success(messages); // data está retornando [] ao invés de {}
             } catch(ex) {
                 return RespGen.error(`Error on getMessagesFromChat - ${ex}`);
             }
@@ -19,7 +19,7 @@ function chatContentService(chatsContentsRepo: IChatsContentsRepository): IChatC
 
         async createChatContentMessages(chatId: number, messages: IMessageDto[]) {
             try {
-                await chatsContentsRepo.createChatContentMessages(chatId, messages);
+                await chatsContentsRepo.createChatContentMessages(chatId, ...messages);
 
                 return RespGen.success();
             } catch(ex) {
@@ -29,7 +29,7 @@ function chatContentService(chatsContentsRepo: IChatsContentsRepository): IChatC
 
         async insertMessagesChatContent(chatId: number, messages: IMessageDto[]) {
             try {
-                await chatsContentsRepo.insertMessagesChatContent(chatId, messages);
+                await chatsContentsRepo.insertMessagesChatContent(chatId, ...messages);
 
                 return RespGen.success();
             } catch(ex) {

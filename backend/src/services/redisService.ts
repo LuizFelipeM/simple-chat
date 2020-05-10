@@ -14,7 +14,7 @@ function redisStartup(): ICacheService {
         redisOptions.auth_pass = process.env.CACHE_AUTH_PASS;
 
     const cacheClient = redis.createClient(redisOptions);
-    cacheClient.on('error', (err) => console.log('ERROR: Occured on cache, error:', err))
+    cacheClient.on('error', (err) => console.log('ERROR: Occured on cache, error:', err));
 
     const hgetAll = promisify(cacheClient.HGETALL).bind(cacheClient);
     const zRange = promisify(cacheClient.ZRANGE).bind(cacheClient);

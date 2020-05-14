@@ -1,26 +1,42 @@
 import { Request, Response } from "express"
-import { userServ } from "../bootstrapper";
+import { usersServ } from "../bootstrapper";
+import { ResponseDtoGen } from "../utils/helper";
+import IUsers from "../interfaces/DB data/IUsers";
+
+const RespGen = new ResponseDtoGen<Omit<IUsers, 'password'>>();
 
 const usersController = {
     async getUserInfo(req: Request, res: Response): Promise<Response> {
-        const { email } = req.query;
-        const resp = await userServ.getUserInformationByEmail(email.toString());
+        try{
+            const { email } = req.query;
+            const resp = await usersServ.getUserInformationByEmail(email.toString());
 
-        return res.json(resp);
+            return res.json(resp);
+        } catch(ex) {
+            return res.status(400).json({ error: `Exception throw on getUserInfo - ${ex}` });
+        }
     },
 
-    async createUser(req: Request, res: Response): Promise<Response> {
-        const { name, email, password, imgUrl } = req.body;
-        const resp = await userServ.createNewUser(name, email, password, imgUrl);
-
-        return res.status(resp.statusCode === 1 ? 400 : 200).json(resp);
+    createUser(req: Request, res: Response): Response {
+        try {
+            const { name, email, password, imgUrl } = req.body;
+            usersServ.createNewUser(name, email, password, imgUrl);
+    
+            return res.status(204).send();
+        } catch(ex) {
+            return res.status(400).json({ error: `Exception throw on createUser - ${ex}` });
+        }
     },
 
-    async deleteChat(req: Request, res: Response): Promise<Response> {
-        const { email } = req.params;
-        const resp = await userServ.deleteUser(email);
+    deleteChat(req: Request, res: Response): Response {
+        try {
+            const { email } = req.params;
+            usersServ.deleteUser(email);
 
-        return res.status(resp.statusCode === 1 ? 400 : 200).json(resp);
+            return res.status(204).send();
+        } catch(ex) {
+            return res.status(400).json({ error: `Exception throw on deleteChat - ${ex}` });
+        }
     }
 }
 

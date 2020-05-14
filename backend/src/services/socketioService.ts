@@ -4,7 +4,7 @@ import socketio from "socket.io";
 import room from "./roomService";
 
 import IMessageDto from "./interfaces/IMessageDto";
-import IChatService from "./interfaces/IChatService";
+import IChatService from "./interfaces/IChatsService";
 import ICacheService from "./interfaces/ICacheService";
 
 let io: socketio.Server;

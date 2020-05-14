@@ -1,8 +1,7 @@
-import IResponseDto from "../../interfaces/Dtos/IRsponseDto";
-import IMessageDto from "../../interfaces/Dtos/IMessageDto";
+import { ChatContent } from "../../interfaces/Entities/ChatContent";
 
 export default interface IChatsContentsService {
-    getMessagesFromChat(chatId: number): IResponseDto<IMessageDto[]>;
-    createChatContentMessages(chatId: number, messages: IMessageDto[]): IResponseDto;
-    insertMessagesChatContent(chatId: number, messages: IMessageDto[]): IResponseDto;
+    getMessagesFromChat(chatId: number, limit?: number): Promise<ChatContent[]>;
+    addMessageToChatContent(chatId: number, userId: number, message: string, messageSentAt: string): void;
+    addMessagesToChatsContent(chatId: number, userIds: number[], messages: string[], messagesSentAt: string[]): void;
 }

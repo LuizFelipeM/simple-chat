@@ -9,7 +9,7 @@ exports.seed = function(knex) {
       return knex(tableName).insert([
         {id: 1, name: 'Tomperro', description: 'Baunilha'},
         {id: 2, name: 'Pneu', description: 'Preto'},
-        {id: 3, name: 'Bolo de limõ', description: 'Azedo'},
+        {id: 3, name: 'Grupo da facul', description: 'Só as coisas produtivas'},
       ]);
     });
 };

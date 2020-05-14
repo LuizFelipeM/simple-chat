@@ -2,18 +2,27 @@
 exports.seed = function(knex) {
   const tableName = 'chats_contents'
 
-  const messages1 = JSON.stringify([{email: "beatriz@gmail.com", message: "No ten tomperro", timestamp: "10:10:05"}])
-  const messages2 = JSON.stringify([{email: "naldinho@gmail.com", message: "Parece um penu", timestamp: "20:00:45"}])
-  const messages3 = JSON.stringify([{email: "beatriz@gmail.com", message: "Azedão", timestamp: "15:24:55"}, {email: "naldinho@gmail.com", message: "tá nada", timestamp: "15:25:55"}])
+  const messages1 = "Vc viu?"
+  const timestamp1 = "2020-05-11T15:15:10.215Z"
+
+  const messages2 = "o que?"
+  const timestamp2 = "2020-05-11T15:15:15.215Z"
+
+  const messages3 = "que a gente tá muito ferrado"
+  const timestamp3 = "2020-05-11T15:16:10.215Z"
+
+  const messages4 = "trocaram a data das nossas provas"
+  const timestamp4 = "2020-05-11T15:16:12.215Z"
 
   // Deletes ALL existing entries
   return knex(tableName).del()
     .then(function () {
       // Inserts seed entries
       return knex(tableName).insert([
-        {chat_id: 1, messages: messages1},
-        {chat_id: 2, messages: messages2},
-        {chat_id: 3, messages: messages3},
+        {chat_id: 3, user_id: 1, message: messages1, message_sent_at: timestamp1},
+        {chat_id: 3, user_id: 3, message: messages2, message_sent_at: timestamp2},
+        {chat_id: 3, user_id: 1, message: messages3, message_sent_at: timestamp3},
+        {chat_id: 3, user_id: 1, message: messages4, message_sent_at: timestamp4},
       ]);
     });
 };

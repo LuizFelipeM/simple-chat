@@ -13,6 +13,7 @@ import chatsContentsRepository from "./repositories/chatsContentsRepository";
 const usersServ = usersService(usersRepository);
 const chatsContentsServ = chatsContentsService(chatsContentsRepository);
 const chatsServ = chatsService(usersRepository, chatsRepository, usersChatsRepository);
+const cacheServ = redisService(chatsContentsRepository);
 
 function Bootstrapper(
     server: http.Server
@@ -20,9 +21,9 @@ function Bootstrapper(
     
     Websocket(
         server,
-        redisService,
+        cacheServ,
         chatsServ
     );    
 }
 
-export { Bootstrapper, chatsServ as chatServ, usersServ as userServ, chatsContentsServ as chatContentServ }
+export { Bootstrapper, chatsServ, usersServ, chatsContentsServ, cacheServ }

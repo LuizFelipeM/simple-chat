@@ -53,7 +53,7 @@
     "@types/jsonschema": "^1.1.1",
     "@types/jsonwebtoken": "^8.3.9",
     "@types/pg": "^7.14.3",
-    "@types/redis": "^2.8.20",
+    "@types/redis": "^2.8.21",
     "@types/socket.io": "^2.1.4",
     "nodemon": "^2.0.3",
     "ts-jest": "^25.5.1",

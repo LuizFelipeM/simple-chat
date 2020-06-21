@@ -1,6 +1,7 @@
-import IMessage from "../../interfaces/Dtos/IMessageDto";
-
 export default interface IMessageDto {
-    chat_id: number,
-    message: IMessage
+  user_name: string,
+  chat_id: number,
+  user_id: number,
+  message: string,
+  message_sent_at: string
 }

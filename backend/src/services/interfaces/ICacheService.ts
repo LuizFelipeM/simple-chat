@@ -1,10 +1,15 @@
-import IMessageDto from "./IMessageDto";
-import IChat from "../../interfaces/DB data/IChatsContents";
+import { ChatsContentsDto } from "../../interfaces/Dtos/ChatsContentsDto";
+
+type MessagesInChat = {
+    [id: number]: string[]
+}
 
 export default interface ICacheService {
-    setData(key: string | number, field: string, value: string): void;
-    getAllData(key: string | number): any;
+    setData(key: string | number, field: string, value: string): void
+    getAllData(key: string | number): any
 
-    setMessage(message: IMessageDto): void;
-    getAllMessages(chat_id: number): any | IChat[];
+    setMessage(message: ChatsContentsDto): Promise<void>
+    getAllMessages(chat_id: number): Promise<string[]> // | ChatsContentsDto[]>
+
+    getAllMessagesByChat(chatIds: number[]): Promise<MessagesInChat[]>
 }

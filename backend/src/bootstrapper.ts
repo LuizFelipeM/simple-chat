@@ -23,7 +23,12 @@ function Bootstrapper(
         server,
         cacheServ,
         chatsServ
-    );    
+    )
+
+    setInterval(async () => {
+        const ids = await chatsServ.getAllChatsId()
+        const messages = await cacheServ.getAllMessagesByChat(ids.map(id => id.chat_id))
+    }, 10000)
 }
 
 export { Bootstrapper, chatsServ, usersServ, chatsContentsServ, cacheServ }

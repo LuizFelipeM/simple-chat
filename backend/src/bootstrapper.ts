@@ -9,6 +9,7 @@ import usersRepository from "./repositories/usersRepository";
 import usersChatsRepository from "./repositories/usersChatsRepository";
 import chatsContentsService from "./services/chatsContentsService";
 import chatsContentsRepository from "./repositories/chatsContentsRepository";
+import { json } from "express";
 
 const usersServ = usersService(usersRepository);
 const chatsContentsServ = chatsContentsService(chatsContentsRepository);
@@ -26,9 +27,34 @@ function Bootstrapper(
     )
 
     setInterval(async () => {
-        const ids = await chatsServ.getAllChatsId()
-        const messages = await cacheServ.getAllMessagesByChat(ids.map(id => id.chat_id))
-    }, 10000)
+        const ids = (await chatsServ.getAllChatsId()).map(id => id.id)
+        const messages = await cacheServ.getAllMessagesByChat(ids)
+
+        const convertedMessages = []
+
+        for await (const teste of messages) {
+            for (const key in teste  ) {
+                if (teste.hasOwnProperty(key)) {
+                    // console.log("chat_content:", { chat_id, user_id, message, message_sent_at })
+
+                    const val = teste[key].map(a => {
+                        const val = JSON.parse(a)
+                        delete val.user_name
+
+                        return val
+                    })
+
+                    chatsContentsRepository.addMessagesToChats(val)
+                }
+            }
+        }
+    }, 300000)
 }
 
-export { Bootstrapper, chatsServ, usersServ, chatsContentsServ, cacheServ }
+export {
+    Bootstrapper,
+    chatsServ,
+    usersServ,
+    chatsContentsServ,
+    cacheServ
+}

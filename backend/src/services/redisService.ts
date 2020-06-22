@@ -60,19 +60,9 @@ function redisStartup(
         },
 
         async getAllMessagesByChat(chatIds: number[]) {
-            console.log('ids', chatIds)
-            const a = chatIds.map(async id => (
-                { [id]: await zRange(cacheKey.keyName(id), 0, -1) as string[] }
-            ))
+            const chatsContents = chatIds.map(async id => ( { [id]: await zRange(cacheKey.keyName(id), 0, -1) as string[] } ))
 
-            console.log('a', a)
-            // a.map(messages => messages.then(t => console.log('message', t)))
-
-
-
-            return [
-                { 1: ['a', 'b'] }
-            ]
+            return chatsContents
         }
     };
 

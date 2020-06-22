@@ -4,6 +4,10 @@ import knex from "../database/dbConnection";
 const tableName = 'chats'
 
 const chatsRepository: IChatsRepository = {
+    async getAllChatsId() {
+        return await knex(tableName).select('id')
+    },
+
     async getByEmail(email: string) {
         return await knex(tableName)
             .select('*')

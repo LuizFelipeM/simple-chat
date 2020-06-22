@@ -11,5 +11,5 @@ export default interface ICacheService {
     setMessage(message: ChatsContentsDto): Promise<void>
     getAllMessages(chat_id: number): Promise<string[]> // | ChatsContentsDto[]>
 
-    getAllMessagesByChat(chatIds: number[]): Promise<MessagesInChat[]>
+    getAllMessagesByChat(chatIds: number[]): Promise<Promise<MessagesInChat>[]>
 }

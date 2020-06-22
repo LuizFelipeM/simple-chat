@@ -12,7 +12,7 @@ function chatsService(
     async function assignUserToChatByUserId(chatId: number, userId: number) { return await usersChatsRepo.assignUserToChat(userId, chatId) }
 
     async function getAllChatsId() {
-        return await usersChatsRepo.getAllChatsId()
+        return await chatsRepo.getAllChatsId()
     }
 
     async function getChatListByUserEmail(email: string) {

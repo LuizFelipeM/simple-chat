@@ -34,14 +34,12 @@ function setup(): void {
 
         handleConnection(socket);
 
-        // socket.on('message', (message: ChatsContentsDto) => {
-        //     console.log('message', message)
+        socket.on('message', (message: ChatsContentsDto) => {
+            console.log('message', message)
 
-        //     io.to(room.roomName(message.chat_id)).emit('message', message)
-        //     _cacheService.setMessage(message)
-        // })
-
-        socket.on('message', (a, b, c) => console.log('qualquercoisa', 'a', a, 'b', b, 'c', c))
+            io.to(room.roomName(message.chat_id)).emit('message', message)
+            _cacheService.setMessage(message)
+        })
     })
 }
 

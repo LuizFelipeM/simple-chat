@@ -6,6 +6,7 @@ type MessagesInChat = {
 
 export default interface ICacheService {
     setData(key: string | number, field: string, value: string): void
+    getDataByField(key: string | number, field: string): any
     getAllData(key: string | number): any
 
     setMessage(message: ChatsContentsDto): Promise<void>

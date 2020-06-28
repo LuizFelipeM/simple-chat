@@ -5,6 +5,8 @@ function usersService(userRepo: IUsersRepository): IUsersService {
     return {
         async getUserInformationByEmail(email: string) {
             const user = await userRepo.findUserInfoByEmail(email);
+            delete user.password
+            
             return user;
         },
 

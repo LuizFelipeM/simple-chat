@@ -34,6 +34,7 @@ function redisStartup(
     const hgetAll = promisify(cacheClient.HGETALL).bind(cacheClient);
     const zRange = promisify(cacheClient.ZRANGE).bind(cacheClient);
     const time = promisify(cacheClient.TIME).bind(cacheClient);
+    const hGet = promisify(cacheClient.HGET).bind(cacheClient);
 
     const redisService: ICacheService = {
         async getAllData(key: string | number) { return await hgetAll(cacheKey.keyName(key)) },
@@ -46,14 +47,21 @@ function redisStartup(
             )
         },
 
+        async getDataByField(key: string | number, field: string) {
+            return await hGet(cacheKey.keyName(key), field)
+        },
+
         async getAllMessages(chat_id: number) { return await zRange(cacheKey.keyName(chat_id), 0, -1) as string[] },
 
         async setMessage(message: ChatsContentsDto): Promise<void> {
             const redisTime = await time()
             const score = redisTime.join('')
+            const key = cacheKey.keyName(message.chat_id)
+
+            console.log('key', key)
 
             cacheClient.ZADD(
-                cacheKey.keyName(message.chat_id),
+                key,
                 score,
                 JSON.stringify(message)
             )

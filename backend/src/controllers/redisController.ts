@@ -1,4 +1,4 @@
-import { Request, Response, json } from 'express';
+import { Request, Response } from 'express';
 
 // import IMessageDto from '../services/interfaces/IMessageDto';
 import { cacheServ } from '../bootstrapper';

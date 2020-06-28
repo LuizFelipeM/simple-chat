@@ -15,8 +15,13 @@ function chatsService(
         return await chatsRepo.getAllChatsId()
     }
 
+    async function getChatListByUserId(userId: number) {
+        const chats = await chatsRepo.getChatsByUserId(userId)
+        return chats;
+    }
+
     async function getChatListByUserEmail(email: string) {
-        const chats = await chatsRepo.getByEmail(email)
+        const chats = await chatsRepo.getChatsByUserEmail(email)
         return chats;
     }
     
@@ -36,6 +41,7 @@ function chatsService(
 
     return {
         getAllChatsId,
+        getChatListByUserId,
         getChatListByUserEmail,
         createNewChatAndAssigntoCreator,
         deleteChat,

@@ -9,7 +9,6 @@ import usersRepository from "./repositories/usersRepository";
 import usersChatsRepository from "./repositories/usersChatsRepository";
 import chatsContentsService from "./services/chatsContentsService";
 import chatsContentsRepository from "./repositories/chatsContentsRepository";
-import { json } from "express";
 
 const usersServ = usersService(usersRepository);
 const chatsContentsServ = chatsContentsService(chatsContentsRepository);
@@ -23,32 +22,29 @@ function Bootstrapper(
     Websocket(
         server,
         cacheServ,
-        chatsServ
+        chatsServ,
+        usersServ
     )
 
-    setInterval(async () => {
-        const ids = (await chatsServ.getAllChatsId()).map(id => id.id)
-        const messages = await cacheServ.getAllMessagesByChat(ids)
+    // setInterval(async () => {
+    //     const ids = (await chatsServ.getAllChatsId()).map(id => id.id)
+    //     const messages = await cacheServ.getAllMessagesByChat(ids)
 
-        const convertedMessages = []
+    //     for await (const teste of messages) { // TODO - MELHORAR ISSO AQUI
+    //         for (const key in teste  ) {
+    //             if (teste.hasOwnProperty(key)) {
+    //                 const val = teste[key].map(a => {
+    //                     const val = JSON.parse(a)
+    //                     delete val.user_name
 
-        for await (const teste of messages) {
-            for (const key in teste  ) {
-                if (teste.hasOwnProperty(key)) {
-                    // console.log("chat_content:", { chat_id, user_id, message, message_sent_at })
+    //                     return val
+    //                 })
 
-                    const val = teste[key].map(a => {
-                        const val = JSON.parse(a)
-                        delete val.user_name
-
-                        return val
-                    })
-
-                    chatsContentsRepository.addMessagesToChats(val)
-                }
-            }
-        }
-    }, 300000)
+    //                 chatsContentsRepository.addMessagesToChats(val)
+    //             }
+    //         }
+    //     }
+    // }, 300000)
 }
 
 export {

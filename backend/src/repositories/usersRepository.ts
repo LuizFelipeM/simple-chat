@@ -6,7 +6,7 @@ const tableName = 'users'
 const usersRepository: IUsersRepository = {
     async findUserInfoByEmail(email: string) {
         return (await knex(tableName)
-            .select('name', 'email', 'img_url')
+            .select('id', 'name', 'email', 'img_url')
             .where({ email }))[0];
     },
 

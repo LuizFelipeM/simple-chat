@@ -22,8 +22,35 @@ function Bootstrapper(
     Websocket(
         server,
         cacheServ,
-        chatsServ
-    );    
+        chatsServ,
+        usersServ
+    )
+
+    // setInterval(async () => {
+    //     const ids = (await chatsServ.getAllChatsId()).map(id => id.id)
+    //     const messages = await cacheServ.getAllMessagesByChat(ids)
+
+    //     for await (const teste of messages) { // TODO - MELHORAR ISSO AQUI
+    //         for (const key in teste  ) {
+    //             if (teste.hasOwnProperty(key)) {
+    //                 const val = teste[key].map(a => {
+    //                     const val = JSON.parse(a)
+    //                     delete val.user_name
+
+    //                     return val
+    //                 })
+
+    //                 chatsContentsRepository.addMessagesToChats(val)
+    //             }
+    //         }
+    //     }
+    // }, 300000)
 }
 
-export { Bootstrapper, chatsServ, usersServ, chatsContentsServ, cacheServ }
+export {
+    Bootstrapper,
+    chatsServ,
+    usersServ,
+    chatsContentsServ,
+    cacheServ
+}

@@ -6,6 +6,7 @@ import IChatsContentsRepository from '../interfaces/repositories/IChatsContentsR
 import IChatsService from './interfaces/IChatsService';
 
 import cacheKey from './cacheKeyService';
+import { ChatsContentsDto } from '../interfaces/Dtos/ChatsContentsDto';
 
 const redisOptions: redis.ClientOpts = {
     host: process.env.CACHE_HOST,
@@ -27,16 +28,18 @@ function redisStartup(
     });
 
     if(canRun) { // TODO - Retirar isso e melhorar a forma de se rodar este evento
-        cacheClient.FLUSHALL((err) => console.log('ERROR: Occured during FLUSHALL, error:', err))
+        cacheClient.FLUSHALL((err) => { if(err) console.log('ERROR: Occured during FLUSHALL, error:', err) })
     }
 
     const hgetAll = promisify(cacheClient.HGETALL).bind(cacheClient);
     const zRange = promisify(cacheClient.ZRANGE).bind(cacheClient);
+    const time = promisify(cacheClient.TIME).bind(cacheClient);
+    const hGet = promisify(cacheClient.HGET).bind(cacheClient);
 
     const redisService: ICacheService = {
-        async getAllData(key) { return await hgetAll(cacheKey.keyName(key)) },
+        async getAllData(key: string | number) { return await hgetAll(cacheKey.keyName(key)) },
 
-        setData(key, field, value) {
+        setData(key: string | number, field: string, value: string) {
             cacheClient.HSET(
                 cacheKey.keyName(key),
                 field,
@@ -44,15 +47,31 @@ function redisStartup(
             )
         },
 
-        async getAllMessages(chat_id) { return await zRange(cacheKey.keyName(chat_id), 0, -1) },
+        async getDataByField(key: string | number, field: string) {
+            return await hGet(cacheKey.keyName(key), field)
+        },
 
-        setMessage(message) {
+        async getAllMessages(chat_id: number) { return await zRange(cacheKey.keyName(chat_id), 0, -1) as string[] },
+
+        async setMessage(message: ChatsContentsDto): Promise<void> {
+            const redisTime = await time()
+            const score = redisTime.join('')
+            const key = cacheKey.keyName(message.chat_id)
+
+            console.log('key', key)
+
             cacheClient.ZADD(
-                cacheKey.keyName(message.chat_id),
-                0, // Score - TODO: Ajustar o score para realmente ordenar a lista
-                JSON.stringify(message.message)
+                key,
+                score,
+                JSON.stringify(message)
             )
         },
+
+        async getAllMessagesByChat(chatIds: number[]) {
+            const chatsContents = chatIds.map(async id => ( { [id]: await zRange(cacheKey.keyName(id), 0, -1) as string[] } ))
+
+            return chatsContents
+        }
     };
 
     return redisService;

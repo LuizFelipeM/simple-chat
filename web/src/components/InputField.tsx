@@ -1,18 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 // import '@material/react-material-icon/dist/material-icon.css';
 import '../styles/inputField.css';
-import { sendMessage } from '../services/socket';
+import IChats from '../interfaces/IChats';
+import { SocketContext } from '../contexts/SocketContext';
+import { ContainerContext } from '../contexts/ContainerContext';
 
-function InputField({ chat }: any) {
+function InputField(props: { selectedChat: IChats | undefined }) {
+  const { userState } = useContext(ContainerContext)
+  const { sendMessage } = useContext(SocketContext)
+
   const [message, setMessage] = useState<string>('')
+
+  useEffect(() => {
+    console.log('Input props.selectedChat', props.selectedChat)
+  }, [props.selectedChat])
 
   const date = new Date();
 
   function handleSubmit(event: React.FormEvent){
     event.preventDefault()
 
-    sendMessage(chat?.chat_id, { email: sessionStorage.getItem('user_email'), message, timestamp: date.getUTCDate().toString()});
+    console.log('props?.selectedChat && userState?.id && userState?.name', (props?.selectedChat && userState?.id && userState?.name) ? true : false)
+    
+    if(props?.selectedChat && userState?.id && userState?.name)
+      sendMessage({
+        chat_id: props.selectedChat.id,
+        message,
+        message_sent_at: date.toISOString(),
+        user_id: userState.id,
+        user_name: userState.name
+      })
+
     setMessage('')
   }
 

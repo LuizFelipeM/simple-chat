@@ -4,7 +4,23 @@ import knex from "../database/dbConnection";
 const tableName = 'chats'
 
 const chatsRepository: IChatsRepository = {
-    async getByEmail(email: string) {
+    async getAllChatsId() {
+        return await knex(tableName).select('id')
+    },
+
+    async getChatsByUserId(userId: number) {
+        return await knex(tableName)
+            .select('*')
+            .from(tableName)
+            .whereIn('id', function() {
+                this.select('chat_id')
+                    .from('users_chats')
+                    .leftJoin('users', 'users_chats.user_id', 'users.id')
+                    .where('users.id', userId)
+            })
+    },
+
+    async getChatsByUserEmail(email: string) {
         return await knex(tableName)
             .select('*')
             .from(tableName)
@@ -13,7 +29,7 @@ const chatsRepository: IChatsRepository = {
                     .from('users_chats')
                     .leftJoin('users', 'users_chats.user_id', 'users.id')
                     .where('users.email', email)
-            });
+            })
     },
 
     async createNewChat(

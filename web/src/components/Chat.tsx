@@ -1,41 +1,24 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 
-import '../styles/chat.css';
+import '../styles/chat.css'
+import IChats from '../interfaces/IChats'
+import MessageBox from './MessageBox'
+import { ContainerContext } from '../contexts/ContainerContext'
 
-import Message from './Message';
-import { subToSocketMessages } from '../services/socket';
-import MessageObserver from '../services/message.observer';
-import IMessage from '../interfaces/content';
-// import api from '../services/api';
+function Chat(props: { selectedChat: IChats | undefined }){
+    const { chats } = useContext(ContainerContext)
 
-let messageListener: MessageObserver;
+    const [chat, setChat] = useState(chats.find(chat => chat.id == props.selectedChat?.id))
 
-class Chat extends React.Component<{chat: any}, { data: { chat_id: Number | null, content: IMessage[]}[] }> {
-    constructor(props: { chat: any }){
-        super(props);
+    useEffect(() => {
+        setChat(chats.find(chat => chat.id == props.selectedChat?.id))
+    }, [chats, props.selectedChat])
 
-        this.state = {
-            data: []
-        };
-        
-        messageListener = new MessageObserver(this);
-        subToSocketMessages(messageListener);
-    }
-
-    render(){
-        return (
-            <div className="chat">
-                {this.state.data?.map((chat: { chat_id: Number | null, content: IMessage[] }) => (
-                    (chat?.chat_id === this.props.chat?.chat_id) ?
-                        chat?.content?.map((message: IMessage, index: number) => 
-                            <Message key={index} content={message} />
-                        )
-                    : null
-                ))}
-            </div>
-        )
-    }
-    
+    return (
+        <div className="chat">
+            {chat?.messages?.map((message, index) => <MessageBox key={index} content={message} />)}
+        </div>
+    )
 }
 
 export default Chat;

@@ -3,48 +3,67 @@ import socketio from "socket.io";
 
 import room from "./roomService";
 
-import IMessageDto from "./interfaces/IMessageDto";
 import IChatService from "./interfaces/IChatsService";
 import ICacheService from "./interfaces/ICacheService";
+import IUsersService from "./interfaces/IUsersService";
+import { ChatsContentsDto } from "../interfaces/Dtos/ChatsContentsDto";
 
-let io: socketio.Server;
-let _cacheService: ICacheService;
-let _chatService: IChatService;
+let io: socketio.Server
+let _cacheService: ICacheService
+let _chatService: IChatService
+let _userService: IUsersService
 
 const Websocket = (
     server: Server,
     cacheService: ICacheService,
-    chatService: IChatService
+    chatService: IChatService,
+    userService: IUsersService
 ) => {
     io = socketio(server);
 
     _cacheService = cacheService;
     _chatService = chatService;
+    _userService = userService
 
     setup();
 }
 
 function setup(): void {
-    io.on('connection', (socket: socketio.Socket) => {
+    io.on('connection', socket => {
         io.on('disconnect', () => console.log(`Socket ${socket.id} disconnected`));
 
         handleConnection(socket);
 
-        socket.on('message', (message: IMessageDto) => {
-            io.to(room.roomName(message.chat_id)).emit('message', message);
-            _cacheService.setMessage(message);
-        });
+        socket.on('message', (message: ChatsContentsDto) => {
+            console.log('message', message)
+
+            io.to(room.roomName(message.chat_id)).emit('message', message)
+            _cacheService.setMessage(message)
+        })
     })
 }
 
 async function handleConnection(socket: socketio.Socket) {
-    const email = socket.request?._query?.email;
-    const scoketId = socket.id;
+    const email = socket.handshake?.query?.email
+    const password = socket.handshake?.query?.password
 
-    const chatList = await _chatService.getChatListByUserEmail(email);
+    const user = await _userService.getUserInformationByEmail(email)
+    
+    const scoketId = socket.id
 
-    _cacheService.setData('users', email, scoketId);
-    socket.emit('chat_list', chatList);
+    const oldSocketId = await _cacheService.getDataByField('users', email)
+    
+    const oldConnection = io.clients().connected
+    oldConnection[oldSocketId]?.disconnect();
+
+    
+    _cacheService.setData('users', email, scoketId)
+    socket.emit('userInfo', { id: user.id, name: user.name })
+    
+    const chatList = await _chatService.getChatListByUserId(user.id)
+
+    chatList.forEach(chat => socket.join(room.roomName(chat.id), (err: any) => { if(err) console.error(err) }))
+    socket.emit('chatList', chatList)
 }
 
 export default Websocket;

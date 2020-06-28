@@ -1,71 +1,42 @@
-import React from 'react';
-import { AxiosResponse } from 'axios';
+import React, { useState, useContext, useEffect } from 'react';
 
-import Chat from '../../components/Chat';
 import ChatPreview from '../../components/ChatPreview';
 import ChatHeader from '../../components/ChatHeader';
 
 import '../../styles/dashboard.css';
 
-import api from '../../services/api';
-import { setupWebSocket, joinChat } from '../../services/socket';
-
 import InputField from '../../components/InputField';
+import IChats from '../../interfaces/IChats';
+import { SocketContext } from '../../contexts/SocketContext';
+import Chat from '../../components/Chat';
 
-class Dashboard extends React.Component<{}, { chats: [], actualChat: any }>{
-  constructor(props: { history: any }){
-    super(props)
+const Dashboard = () => {
+  const { chats } = useContext(SocketContext)
 
-    if(!sessionStorage.getItem('token'))
-      props.history.push('/login');
+  const [selectedChat, setSelectedChat] = useState<IChats | undefined>(undefined)
 
-    this.state = {
-      chats: [],
-      actualChat: undefined
-    }
-
-    this.handleChatSelection = this.handleChatSelection.bind(this);
-    this.listChats = this.listChats.bind(this);
+  function handleChatSelection(chatId: Number) {
+    const chat = chats?.find(chat => chat.id === chatId)
+    setSelectedChat(chat)
   }
 
-  componentDidMount(){
-    this.listChats();
-    setupWebSocket();
-  }
+  useEffect(() => {
+    console.log('select', selectedChat)
+  }, [selectedChat])
 
-  async listChats(){
-    const response: AxiosResponse<any> = await api.get('/chats', { headers: { token: sessionStorage.getItem('token') } });
-    this.setState({ chats: response.data })
-  }
+  return (
+    <div className="dashboard-content">
+      <aside className="contact-list">
+        {chats?.map(chat => <ChatPreview key={chat.id} chat={chat} action={handleChatSelection} />)}
+      </aside>
 
-  handleChatSelection(chat_id: Number) {
-    const actual = this.state.chats?.find((chat: any)=> chat.chat_id === chat_id);
-    this.setState({
-       actualChat: actual
-    })
-  }
-
-  render(){
-    return (
-      <div className="dashboard-content">
-        <aside className="contact-list">
-          {this.state.chats?.map((chat: any)=>{
-            joinChat(chat?.chat_id)
-
-            return (
-              <ChatPreview key={chat.chat_id} chat={chat} action={this.handleChatSelection} />
-            )
-          })}
-        </aside>
-
-        <main>
-          <ChatHeader chat={this.state.actualChat} />
-          <Chat chat={this.state.actualChat} />
-          <InputField chat={this.state.actualChat} />
-        </main>
-      </div>
-    );
-  }
+      <main>
+        <ChatHeader selectedChat={selectedChat} />
+        <Chat selectedChat={selectedChat} />
+        <InputField selectedChat={selectedChat} />
+      </main>
+    </div>
+  )
 }
 
 export default Dashboard;

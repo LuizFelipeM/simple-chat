@@ -7,7 +7,10 @@ const tableName = 'chats_contents';
 const chatsContentsRepository: IChatsContentsRepository = {
     async getMesagesFromChat(chat_id: number, limit = 15) {
         return await knex(tableName)
-            .select('users.name', 'chats_contents.*')
+            .select(
+                knex.ref('users.name')
+                    .as('user_name'), 'chats_contents.*'
+            )
             .where({ chat_id })
             .leftJoin('users', 'users.id', 'chats_contents.user_id')
             .orderBy('created_at', 'desc')

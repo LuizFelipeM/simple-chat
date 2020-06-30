@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 
 // import '@material/react-material-icon/dist/material-icon.css';
 import '../styles/inputField.css';
@@ -12,17 +12,11 @@ function InputField(props: { selectedChat: IChats | undefined }) {
 
   const [message, setMessage] = useState<string>('')
 
-  useEffect(() => {
-    console.log('Input props.selectedChat', props.selectedChat)
-  }, [props.selectedChat])
-
   const date = new Date();
 
   function handleSubmit(event: React.FormEvent){
     event.preventDefault()
 
-    console.log('props?.selectedChat && userState?.id && userState?.name', (props?.selectedChat && userState?.id && userState?.name) ? true : false)
-    
     if(props?.selectedChat && userState?.id && userState?.name)
       sendMessage({
         chat_id: props.selectedChat.id,

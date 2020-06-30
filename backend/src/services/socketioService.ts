@@ -19,13 +19,13 @@ const Websocket = (
     chatService: IChatService,
     userService: IUsersService
 ) => {
-    io = socketio(server);
+    io = socketio(server)
 
-    _cacheService = cacheService;
-    _chatService = chatService;
+    _cacheService = cacheService
+    _chatService = chatService
     _userService = userService
 
-    setup();
+    setup()
 }
 
 function setup(): void {
@@ -54,7 +54,7 @@ async function handleConnection(socket: socketio.Socket) {
     const oldSocketId = await _cacheService.getDataByField('users', email)
     
     const oldConnection = io.clients().connected
-    oldConnection[oldSocketId]?.disconnect();
+    oldConnection[oldSocketId]?.disconnect()
 
     
     _cacheService.setData('users', email, scoketId)
@@ -62,8 +62,13 @@ async function handleConnection(socket: socketio.Socket) {
     
     const chatList = await _chatService.getChatListByUserId(user.id)
 
-    chatList.forEach(chat => socket.join(room.roomName(chat.id), (err: any) => { if(err) console.error(err) }))
+    chatList.forEach(chat => {
+        socket.join(room.roomName(chat.id), (err: any) => { if(err) console.error(err) })
+        _cacheService.getAllMessages(chat.id)
+            .then(messages => socket.emit('messagesOnChat', chat.id, messages))
+    })
     socket.emit('chatList', chatList)
+    //socket.emit('message', message));
 }
 
 export default Websocket;

@@ -10,7 +10,7 @@ export default interface ICacheService {
     getAllData(key: string | number): any
 
     setMessage(message: ChatsContentsDto): Promise<void>
-    getAllMessages(chat_id: number): Promise<string[]> // | ChatsContentsDto[]>
+    getAllMessages(chat_id: number): Promise<any[]> // ChatsContentsDto[]>
 
     getAllMessagesByChat(chatIds: number[]): Promise<Promise<MessagesInChat>[]>
 }

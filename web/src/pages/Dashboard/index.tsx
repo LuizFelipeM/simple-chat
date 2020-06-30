@@ -19,11 +19,7 @@ const Dashboard = () => {
     const chat = chats?.find(chat => chat.id === chatId)
     setSelectedChat(chat)
   }
-
-  useEffect(() => {
-    console.log('select', selectedChat)
-  }, [selectedChat])
-
+  
   return (
     <div className="dashboard-content">
       <aside className="contact-list">

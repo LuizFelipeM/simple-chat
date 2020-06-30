@@ -3,7 +3,7 @@ import * as H from 'history';
 
 import '../../styles/login.css';
 
-import * as logo from '../../assets/logo-1.png'
+// import * as logo from '../../assets/logo-1.png'
 import { SocketContext } from '../../contexts/SocketContext';
 import { ContainerContext } from '../../contexts/ContainerContext';
 // const logo = '../../assets/logo-1.png'

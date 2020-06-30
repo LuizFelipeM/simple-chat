@@ -47,6 +47,13 @@
 .message-content header .timestamp{
     color: #CCCCCC;
     font-size: 12px;
+    text-align: right;
+    margin-left: 15px;
+}
+
+.message-content header .timestamp span {
+    display: block;
+    right: 0;
 }
 
 .message-content .message{

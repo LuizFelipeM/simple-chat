@@ -30,7 +30,19 @@ const SocketProvider = (props: { children: JSX.Element }) => {
       if(chat.id === content.chat_id)
         return { ...chat, ...{ messages: chat?.messages?.length ? [...chat.messages, content] : [content]} }
       return chat
-    });
+    })
+
+    setChats(chatsWithMessages)
+  })
+
+  socket.on('messagesOnChat', (chatId: string, messages: Message[]) => {
+    const id = parseInt(chatId)
+
+    const chatsWithMessages = chats.map(chat => {
+      if(chat.id == id)
+        return { ...chat, ...{ messages } }
+      return chat
+    })
 
     setChats(chatsWithMessages)
   })

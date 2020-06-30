@@ -15,16 +15,17 @@ const chatsContentsServ = chatsContentsService(chatsContentsRepository);
 const chatsServ = chatsService(usersRepository, chatsRepository, usersChatsRepository);
 const cacheServ = redisService(chatsContentsRepository);
 
-function Bootstrapper(
-    server: http.Server
-): void {
+function Bootstrapper(server: http.Server): void {
     
-    Websocket(
-        server,
-        cacheServ,
-        chatsServ,
-        usersServ
-    )
+    cacheMessages()
+        .then(() => 
+            Websocket(
+                server,
+                cacheServ,
+                chatsServ,
+                usersServ
+            )
+        )
 
     // setInterval(async () => {
     //     const ids = (await chatsServ.getAllChatsId()).map(id => id.id)
@@ -45,6 +46,17 @@ function Bootstrapper(
     //         }
     //     }
     // }, 300000)
+}
+
+async function cacheMessages() {
+    const chatIds = await chatsServ.getAllChatsId()
+
+    chatIds.forEach(async chat => {
+        const messages = await chatsContentsServ.getMessagesFromChat(chat.id)
+
+        for (const message of messages)
+            cacheServ.setMessage(message)
+    })
 }
 
 export {

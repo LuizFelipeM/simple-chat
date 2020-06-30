@@ -17,10 +17,15 @@ function MessageBox(props: { content: IMessage }){
             const dd = dt < 10 ? `0${dt.toString()}` : dt
             const mm = month < 10 ? `0${month + 1}` : month + 1
             
-            return `${date.getHours()}:${date.getMinutes()} - ${dd}/${mm}/${year}`
+            return {
+                time: `${date.getHours()}:${date.getMinutes()} `,
+                date: ` ${dd}/${mm}/${year}`
+            }
         }
 
-        return `${date.getHours()}:${date.getMinutes()}`
+        return {
+            time: `${date.getHours()}:${date.getMinutes()}`
+        }
     }
 
     return (
@@ -28,7 +33,10 @@ function MessageBox(props: { content: IMessage }){
             <div className="message-content">
                 <header>
                     <span className="name">{props.content.user_name}</span>
-                    <small className="timestamp">{dateParser(props.content.message_sent_at)}</small>
+                    <small className="timestamp">
+                        {dateParser(props.content.message_sent_at).date && <span className="date">{dateParser(props.content.message_sent_at).date}</span>}
+                        <span className="time">{dateParser(props.content.message_sent_at).time}</span>
+                    </small>
                 </header>
                 <span className="message">{props?.content?.message}</span>
             </div>

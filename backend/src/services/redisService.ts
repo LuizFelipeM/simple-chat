@@ -51,14 +51,12 @@ function redisStartup(
             return await hGet(cacheKey.keyName(key), field)
         },
 
-        async getAllMessages(chat_id: number) { return await zRange(cacheKey.keyName(chat_id), 0, -1) as string[] },
+        async getAllMessages(chat_id: number) { return (await zRange(cacheKey.keyName(chat_id), 0, -1) as string[]).map(chatContent => JSON.parse(chatContent)) },
 
         async setMessage(message: ChatsContentsDto): Promise<void> {
             const redisTime = await time()
             const score = redisTime.join('')
             const key = cacheKey.keyName(message.chat_id)
-
-            console.log('key', key)
 
             cacheClient.ZADD(
                 key,

@@ -1,31 +1,13 @@
-import IUsersRepository from "../interfaces/repositories/IUsersRepository";
 import knex from "../database/dbConnection";
 
 const tableName = 'users'
 
-const usersRepository: IUsersRepository = {
-    async findUserInfoByEmail(email: string) {
-        return (await knex(tableName)
-            .select('id', 'name', 'email', 'img_url')
-            .where({ email }))[0];
-    },
+const usersRepository = {
+    findUserInfoByEmail: async (email: string) => (await knex(tableName).select('id', 'name', 'email', 'img_url').where({ email }))[0],
 
-    async createUser(name: string, email: string, password: string, img_url?: string) {
-        return await knex(tableName)
-            .insert({
-                name,
-                email,
-                password,
-                img_url
-            });
-    },
+    createUser: (name: string, email: string, password: string, img_url?: string) => knex(tableName).insert({ name, email, password, img_url }),
 
-    async deleteUser(email: string) {
-        return (await knex(tableName)
-            .where({ email })
-            .del()
-            .returning('*'))[0];
-    },
+    deleteUser: (email: string) => knex(tableName).where({ email }).del().returning('*')
 }
 
 export default usersRepository;

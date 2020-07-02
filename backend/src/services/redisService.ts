@@ -1,78 +1,63 @@
 import redis from 'redis';
 import { promisify } from 'util';
 
-import ICacheService from "./interfaces/ICacheService";
-import IChatsContentsRepository from '../interfaces/repositories/IChatsContentsRepository';
-import IChatsService from './interfaces/IChatsService';
-
 import cacheKey from './cacheKeyService';
 import { ChatsContentsDto } from '../interfaces/Dtos/ChatsContentsDto';
 
-const redisOptions: redis.ClientOpts = {
-    host: process.env.CACHE_HOST,
-    port: Number(process.env.CACHE_PORT)
-}
+/* ----- TODO -----
 
-function redisStartup(
-    chatsContentsRepo: IChatsContentsRepository,
-    // chatsService: IChatsService
-): ICacheService {
-    if(process.env.CACHE_AUTH_PASS)
-        redisOptions.auth_pass = process.env.CACHE_AUTH_PASS;
-
-    let canRun = true;
-    const cacheClient = redis.createClient(redisOptions);
-    cacheClient.on('error', (err) => {
-        console.log('ERROR: Occured on cache, error:', err);
-        canRun = false;
-    });
-
-    if(canRun) { // TODO - Retirar isso e melhorar a forma de se rodar este evento
-        cacheClient.FLUSHALL((err) => { if(err) console.log('ERROR: Occured during FLUSHALL, error:', err) })
+    Melhorar e refatorar redis, separar e isolar conceitos
+    separar instancia de client e bindings
+*/
+const redisStartup = () => {
+    const redisOptions: redis.ClientOpts = {
+        host: process.env.CACHE_HOST,
+        port: process.env.CACHE_PORT ? parseInt(process.env.CACHE_PORT) : undefined,
+        auth_pass: process.env.CACHE_AUTH_PASS ?? undefined
     }
 
-    const hgetAll = promisify(cacheClient.HGETALL).bind(cacheClient);
-    const zRange = promisify(cacheClient.ZRANGE).bind(cacheClient);
-    const time = promisify(cacheClient.TIME).bind(cacheClient);
-    const hGet = promisify(cacheClient.HGET).bind(cacheClient);
+    let canRun = true
+    const redisClient = redis.createClient(redisOptions)
 
-    const redisService: ICacheService = {
-        async getAllData(key: string | number) { return await hgetAll(cacheKey.keyName(key)) },
+    redisClient.on('error', err => {
+        console.log('ERROR: Occured on cache, error:', err)
+        canRun = false
+    })
 
-        setData(key: string | number, field: string, value: string) {
-            cacheClient.HSET(
-                cacheKey.keyName(key),
-                field,
-                value
-            )
+    if(canRun) { // TODO - Retirar isso e melhorar a forma de se rodar este evento
+        redisClient.FLUSHALL((err) => { if(err) console.log('ERROR: Occured during FLUSHALL, error:', err) })
+    }
+
+    const hgetAll = promisify(redisClient.HGETALL).bind(redisClient)
+    const zRange = promisify(redisClient.ZRANGE).bind(redisClient)
+    const hGet = promisify(redisClient.HGET).bind(redisClient)
+
+    return {
+        getAllData: async (key: string, id: string | number) => await hgetAll(cacheKey.generateKeyName(key, id)),
+
+        setData: (key: string, id: string | number, field: string, value: string) => {
+            const Key = cacheKey.generateKeyName(key, id)
+
+            redisClient.HSET(Key, field, value)
         },
 
-        async getDataByField(key: string | number, field: string) {
-            return await hGet(cacheKey.keyName(key), field)
+        getDataByField: async (key: string | number, field: string) => await hGet(cacheKey.chatKeyName(key), field),
+
+        getAllMessages: async (chat_id: number) => (await zRange(cacheKey.chatKeyName(chat_id), 0, -1) as string[]).map(chatContent => JSON.parse(chatContent)),
+
+        setMessage: (message: ChatsContentsDto) => {
+            const score = Date.now()
+            const key = cacheKey.chatKeyName(message.chat_id)
+
+            redisClient.ZADD(key, score, JSON.stringify(message))
         },
 
-        async getAllMessages(chat_id: number) { return (await zRange(cacheKey.keyName(chat_id), 0, -1) as string[]).map(chatContent => JSON.parse(chatContent)) },
-
-        async setMessage(message: ChatsContentsDto): Promise<void> {
-            const redisTime = await time()
-            const score = redisTime.join('')
-            const key = cacheKey.keyName(message.chat_id)
-
-            cacheClient.ZADD(
-                key,
-                score,
-                JSON.stringify(message)
-            )
-        },
-
-        async getAllMessagesByChat(chatIds: number[]) {
-            const chatsContents = chatIds.map(async id => ( { [id]: await zRange(cacheKey.keyName(id), 0, -1) as string[] } ))
+        getAllMessagesByChat: (chatIds: number[]) => {
+            const chatsContents = chatIds.map(async id => ( { [id]: await zRange(cacheKey.chatKeyName(id), 0, -1) as string[] } ))
 
             return chatsContents
         }
-    };
-
-    return redisService;
+    }
 }
 
-export default redisStartup;
+export default redisStartup();

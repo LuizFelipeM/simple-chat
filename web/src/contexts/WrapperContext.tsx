@@ -2,24 +2,24 @@ import React, { createContext, useState } from 'react'
 import IChats from '../interfaces/IChats'
 import UserState from './UserState'
 
-type ContainerContextType = {
+type WrapperContextType = {
     userState: Partial<UserState> | undefined
     setUserState: React.Dispatch<React.SetStateAction<Partial<UserState> | undefined>>
     chats: IChats[]
     setChats: React.Dispatch<React.SetStateAction<IChats[]>>
 }
 
-const ContainerContext = createContext<ContainerContextType>({ userState: undefined, setUserState: () => {}, chats: [], setChats: () => {} })
+const WrapperContext = createContext<WrapperContextType>({ userState: undefined, setUserState: () => {}, chats: [], setChats: () => {} })
 
-const ContainerProvider = (props: { children: JSX.Element }) => {
+const WrapperProvider = (props: { children: JSX.Element }) => {
     const [userState, setUserState] = useState<Partial<UserState>>()
     const [chats, setChats] = useState<IChats[]>([])
 
     return (
-        <ContainerContext.Provider value={{ userState, setUserState, chats, setChats }}>
+        <WrapperContext.Provider value={{ userState, setUserState, chats, setChats }}>
             {props.children}
-        </ContainerContext.Provider>
+        </WrapperContext.Provider>
     )
 }
 
-export { ContainerContext, ContainerProvider }
+export { WrapperContext, WrapperProvider }

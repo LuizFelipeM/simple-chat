@@ -1,9 +1,9 @@
 import React, { useContext } from 'react'
 import IMessage from '../interfaces/Message'
-import { ContainerContext } from '../contexts/ContainerContext'
+import { WrapperContext } from '../contexts/WrapperContext'
 
 function MessageBox(props: { content: IMessage }){
-    const { userState } = useContext(ContainerContext)
+    const { userState } = useContext(WrapperContext)
 
     const dateParser = (dateString: string) => {
         const date = new Date(dateString)

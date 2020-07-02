@@ -5,7 +5,7 @@ import socketio from 'socket.io-client'
 import IChats from '../interfaces/IChats';
 import Message from '../interfaces/Message';
 import UserState from './UserState';
-import { ContainerContext } from './ContainerContext';
+import { WrapperContext } from './WrapperContext';
 
 type SocketContextType = {
   chats: IChats[]
@@ -18,7 +18,7 @@ const SocketContext = createContext<SocketContextType>({ chats: [], setChats: ()
 
 const SocketProvider = (props: { children: JSX.Element }) => {
   // const { userState, setUserState } = useContext(UserContext)
-  const { chats, setChats, userState, setUserState } = useContext(ContainerContext)
+  const { chats, setChats, userState, setUserState } = useContext(WrapperContext)
 
   const [socket] = useState(socketio('http://localhost:8080', { autoConnect: false }))
   

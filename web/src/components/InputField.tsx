@@ -4,10 +4,10 @@ import React, { useState, useContext } from 'react';
 import '../styles/inputField.css';
 import IChats from '../interfaces/IChats';
 import { SocketContext } from '../contexts/SocketContext';
-import { ContainerContext } from '../contexts/ContainerContext';
+import { WrapperContext } from '../contexts/WrapperContext';
 
 function InputField(props: { selectedChat: IChats | undefined }) {
-  const { userState } = useContext(ContainerContext)
+  const { userState } = useContext(WrapperContext)
   const { sendMessage } = useContext(SocketContext)
 
   const [message, setMessage] = useState<string>('')

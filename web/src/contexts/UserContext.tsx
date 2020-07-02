@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useContext } from 'react';
 import UserState from './UserState';
 import { SocketContext } from './SocketContext';
-import { ContainerContext } from './ContainerContext';
+import { WrapperContext } from './WrapperContext';
 
 // const socketMessages = new Subject();
 // const subToSocketMessages = (Observer: IObserver<any>) => { socketMessages.subscribe(Observer) };
@@ -16,7 +16,7 @@ const UserContext = createContext<UserContextType>({})
 
 const UserProvider = (props: { children: JSX.Element }): JSX.Element => {
     const { login } = useContext(SocketContext)
-    const { userState, setUserState } = useContext(ContainerContext)
+    const { userState, setUserState } = useContext(WrapperContext)
 
     useEffect(() => {
         const sessionUserData: Partial<UserState> = {

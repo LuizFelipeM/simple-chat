@@ -10,7 +10,7 @@ import { WrapperContext } from '../../contexts/WrapperContext';
 
 
 function Login(props: { history: H.History }){
-  const { userState, setUserState } = useContext(WrapperContext)
+  const { currentUser, setCurrentUser } = useContext(WrapperContext)
   const { login } = useContext(SocketContext)
 
   const [email, setEmail] = useState('')
@@ -29,7 +29,7 @@ function Login(props: { history: H.History }){
     //   history.push('/');
     // }
 
-    setUserState({ ...userState, ...{ email }})
+    setCurrentUser({ ...currentUser, ...{ email }})
     login(email, password)
     props.history.push('/');
   }

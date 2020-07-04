@@ -7,16 +7,16 @@ import { WrapperContext } from './WrapperContext';
 // const subToSocketMessages = (Observer: IObserver<any>) => { socketMessages.subscribe(Observer) };
 
 type UserContextType = {
-    // userState: Partial<UserState> | undefined
-    // setUserState: React.Dispatch<React.SetStateAction<Partial<UserState> | undefined>>
+    // currentUser: Partial<UserState> | undefined
+    // setCurrentUser: React.Dispatch<React.SetStateAction<Partial<UserState> | undefined>>
 }
 
-// const UserContext = createContext<UserContextType>({ userState: undefined, setUserState: () => {} })
+// const UserContext = createContext<UserContextType>({ currentUser: undefined, setCurrentUser: () => {} })
 const UserContext = createContext<UserContextType>({})
 
 const UserProvider = (props: { children: JSX.Element }): JSX.Element => {
     const { login } = useContext(SocketContext)
-    const { userState, setUserState } = useContext(WrapperContext)
+    const { currentUser, setCurrentUser } = useContext(WrapperContext)
 
     useEffect(() => {
         const sessionUserData: Partial<UserState> = {
@@ -29,16 +29,16 @@ const UserProvider = (props: { children: JSX.Element }): JSX.Element => {
         if(sessionUserData.email)
             login(sessionUserData.email, '123')
 
-        setUserState(sessionUserData)
+        setCurrentUser(sessionUserData)
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
-        if(userState?.id) sessionStorage.setItem('userId', userState.id.toString())
-        if(userState?.name) sessionStorage.setItem('userName', userState.name)
-        if(userState?.email) sessionStorage.setItem('userEmail', userState.email)
-        if(userState?.token) sessionStorage.setItem('token', userState.token)
-    }, [userState])
+        if(currentUser?.id) sessionStorage.setItem('userId', currentUser.id.toString())
+        if(currentUser?.name) sessionStorage.setItem('userName', currentUser.name)
+        if(currentUser?.email) sessionStorage.setItem('userEmail', currentUser.email)
+        if(currentUser?.token) sessionStorage.setItem('token', currentUser.token)
+    }, [currentUser])
 
     return (
         <UserContext.Provider value={{}}>

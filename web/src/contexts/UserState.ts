@@ -1,11 +1,11 @@
-import IChats from "../interfaces/IChats";
+import Chat from "../interfaces/Chat";
 
 type UserState = {
   id: number
   name: string
   email: string
   token: string
-  chatList: IChats[]
+  chatList: Chat[]
 }
 
 export default UserState

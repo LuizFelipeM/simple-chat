@@ -1,0 +1,92 @@
+.chat{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 460px;
+    padding: 20px;
+}
+
+.chat::after{
+    content: "";
+    background: url(https://i.ibb.co/23YnHBX/teste.jpg);
+    opacity: 0.1;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+
+.chat > *{ z-index: 1; }
+
+.message-content{
+    width: max-content;
+    max-width: 45%;
+    min-width: 125px;
+
+    padding: 6px;
+    border-radius: 4px;
+    background: #666666;
+}
+
+.message-content header{
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+
+    margin-bottom: 5px;
+}
+
+.message-content header .name{
+    width: 100%;
+    color: magenta;
+}
+
+.message-content header .timestamp{
+    color: #CCCCCC;
+    font-size: 12px;
+    text-align: right;
+    margin-left: 15px;
+}
+
+.message-content header .timestamp span {
+    display: block;
+    right: 0;
+}
+
+.message-content .message{
+    text-align: left;
+}
+
+.my-message header .name{ display: none; visibility: hidden; }
+
+.my-message header .timestamp{ margin: 0 0 0 auto }
+
+.my-message .message-content{ margin: 8px 0 8px auto; }
+
+.other-message .message-content{
+    margin: 8px auto 8px 0;
+    text-align: left;
+}
+
+/* width */
+::-webkit-scrollbar {
+width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+background: #555;
+}

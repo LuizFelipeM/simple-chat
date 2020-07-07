@@ -6,7 +6,7 @@ import ChatHeader from '../../components/ChatHeader/ChatHeader';
 import '../../styles/dashboard.css';
 
 import InputField from '../../components/InputField/InputField';
-import ChatBox from '../../components/Chat/Chat';
+import ChatBox from '../../components/Chat/ChatBox';
 import { WrapperContext } from '../../contexts/WrapperContext';
 import ChatContent from '../../interfaces/ChatContent';
 
@@ -42,7 +42,7 @@ const Dashboard = () => {
 
       <main>
         <ChatHeader selectedChat={selectedChat} />
-        <ChatBox selectedChatId={selectedChatId} selectedChat={selectedChat} />
+        <ChatBox selectedChatId={selectedChatId} />
         <InputField selectedChatId={selectedChatId} selectedChat={selectedChat} />
       </main>
     </div>

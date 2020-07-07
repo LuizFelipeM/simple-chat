@@ -1,10 +1,7 @@
-import Message from "./Message"
-
 type ChatContent = {
   name: string,
   description: string,
-  img_url: string,
-  messages: Message[]
+  img_url: string
 }
 
 export default ChatContent

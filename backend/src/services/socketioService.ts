@@ -44,17 +44,20 @@ function setup(): void {
 }
 
 async function handleConnection(socket: socketio.Socket) {
-    const email = socket.handshake?.query?.email
+    const email = socket.handshake?.query?.email?.toLowerCase()
     const password = socket.handshake?.query?.password
 
     const user = await _userService.getUserInformationByEmail(email)
     
     const scoketId = socket.id
 
-    const oldSocketId = await _cacheService.getDataByField('users', email)
-    
-    const oldConnection = io.clients().connected
-    oldConnection[oldSocketId]?.disconnect()
+    // const oldSocketId = await _cacheService.getDataByField('users', email)
+    // console.log('oldSocketId', oldSocketId, 'scoketId', scoketId)
+
+    // const oldConnection = io.clients()
+    // const oldSocket = oldConnection[oldSocketId]
+
+    // console.log('oldConnection', oldConnection,'oldSocket', oldSocket)
 
     
     _cacheService.setData('users', email, scoketId)
@@ -67,6 +70,7 @@ async function handleConnection(socket: socketio.Socket) {
         _cacheService.getAllMessages(chat.id)
             .then(messages => socket.emit('messagesOnChat', chat.id, messages))
     })
+    
     socket.emit('chatList', chatList)
     //socket.emit('message', message));
 }

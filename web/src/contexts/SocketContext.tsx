@@ -1,51 +1,69 @@
-
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import socketio from 'socket.io-client'
 
-import Chat from '../interfaces/Chat';
-import Message from '../interfaces/Message';
-import UserState from './UserState';
-import { WrapperContext } from './WrapperContext';
-import ChatDto from '../interfaces/ChatDto';
-import ChatContent from '../interfaces/ChatContent';
+import Chat from '../interfaces/Chat'
+import Message from '../interfaces/Message'
+import UserState from './UserState'
+import { WrapperContext } from './WrapperContext'
+import ChatDto from '../interfaces/ChatDto'
+import MessageDto from '../interfaces/MessagesDto'
 
 type SocketContextType = {
   login: (email: string, password: string) => void
   sendMessage: (content: Message) => void
+  messages: MessageDto
+  setMessages: React.Dispatch<React.SetStateAction<MessageDto>>
 }
 
-const SocketContext = createContext<SocketContextType>({ login: () => {}, sendMessage: () => {} })
+const initialContext = {
+  login: () => {},
+  sendMessage: () => {},
+  messages: {},
+  setMessages: () => {},
+}
+
+const SocketContext = createContext<SocketContextType>(initialContext)
 
 const SocketProvider = (props: { children: JSX.Element }) => {
-  // const { currentUser, setCurrentUser } = useContext(UserContext)
-  const { chats, setChats, currentUser, setCurrentUser } = useContext(WrapperContext)
+  const { setChats, currentUser, setCurrentUser } = useContext(WrapperContext)
+  
+  const [messages, setMessages] = useState<MessageDto>({})
+  const [socket] = useState(socketio('http://localhost:8080', {
+    autoConnect: false
+  }))
 
-  const [socket] = useState(socketio('http://localhost:8080', { autoConnect: false }))
+  useEffect(() => {
+    removeSocketListeners()
+    return removeSocketListeners()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket])
+
+  function removeSocketListeners() {
+    socket.off('message')
+    socket.off('messagesOnChat')
+    socket.off('userInfo')
+    socket.off('chatList')
+  }
   
   socket.on('chatList', handleChatList)
   socket.on('userInfo', (data: Pick<UserState, 'name' | 'id'>) => setCurrentUser({ ...currentUser, ...data }))
 
-  socket.on('message', (content: Message) => {
-    console.log('chats', chats)
-    const messages = [ ...chats[content.chat_id].messages, content ]
+  socket.on('message', handleMessage)
 
-    setChats({ ...chats, ...{ ...chats[content.chat_id], messages } })
+  socket.on('messagesOnChat', (chatId: string, incomingMessages: Message[]) => {
+    const newMessages = Object.assign({}, messages, { [chatId]: incomingMessages })
+
+    setMessages(newMessages)
   })
 
-  socket.on('messagesOnChat', (chatId: string, messages: Message[]) => {
-    if(chats[parseInt(chatId)]){
-      const chat: ChatContent = { 
-        name: chats[parseInt(chatId)].name,
-        description: chats[parseInt(chatId)].description,
-        img_url: chats[parseInt(chatId)].img_url,
-        messages
-      }
-      
-      const newChats = Object.assign({}, chats, { [chatId]: chat })
-      console.log('newChats', newChats)
-      // setChats(newChats)
-    }
-  })
+  function handleMessage(content: Message){
+    socket.off('message')
+    const messageArr = [...( messages[content.chat_id] ? messages[content.chat_id] : [] ), content]
+
+    console.log('handleMessage', messageArr)
+
+    setMessages(Object.assign({}, messages, { [content.chat_id]: messageArr }))
+  }
 
   const sendMessage = (content: Message) => socket.emit('message', content)
 
@@ -69,7 +87,12 @@ const SocketProvider = (props: { children: JSX.Element }) => {
   }
 
   return (
-    <SocketContext.Provider value={{ login, sendMessage }}>
+    <SocketContext.Provider value={{
+      login,
+      sendMessage,
+      messages,
+      setMessages
+    }}>
       {props.children}
     </SocketContext.Provider>
   )

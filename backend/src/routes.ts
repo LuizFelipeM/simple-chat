@@ -21,6 +21,5 @@ routes.delete('/users/:email', usersController.deleteChat);
 
 routes.get('/chats/contents', chatsContentsController.getAllMessagesFromChat);
 routes.post('/chats/contents', chatsContentsController.addMessageToChat);
-routes.post('/chats/contents/messages', chatsContentsController.addMessagesToChat);
 
 export default routes;

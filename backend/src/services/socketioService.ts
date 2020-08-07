@@ -2,28 +2,23 @@ import { Server } from "http";
 import socketio from "socket.io";
 
 import room from "./roomService";
-
-import IChatService from "./interfaces/IChatsService";
-import ICacheService from "./interfaces/ICacheService";
-import IUsersService from "./interfaces/IUsersService";
 import { ChatsContentsDto } from "../interfaces/Dtos/ChatsContentsDto";
+import redisService from "./redisService";
+import chatsService from "./chatsService";
+import usersService from "./usersService";
 
 let io: socketio.Server
-let _cacheService: ICacheService
-let _chatService: IChatService
-let _userService: IUsersService
+
+/* ----- TODO -----
+
+    Melhorar e refatorar websocket, refatorar
+    entidades, tipos e interfaces
+*/
 
 const Websocket = (
-    server: Server,
-    cacheService: ICacheService,
-    chatService: IChatService,
-    userService: IUsersService
+    server: Server
 ) => {
     io = socketio(server)
-
-    _cacheService = cacheService
-    _chatService = chatService
-    _userService = userService
 
     setup()
 }
@@ -37,8 +32,8 @@ function setup(): void {
         socket.on('message', (message: ChatsContentsDto) => {
             console.log('message', message)
 
-            io.to(room.roomName(message.chat_id)).emit('message', message)
-            _cacheService.setMessage(message)
+            io.to(room.createName(message.chat_id)).emit('message', message)
+            redisService.setMessage(message)
         })
     })
 }
@@ -47,7 +42,7 @@ async function handleConnection(socket: socketio.Socket) {
     const email = socket.handshake?.query?.email?.toLowerCase()
     const password = socket.handshake?.query?.password
 
-    const user = await _userService.getUserInformationByEmail(email)
+    const user = await usersService.getUserInformationByEmail(email)
     
     const scoketId = socket.id
 
@@ -60,14 +55,14 @@ async function handleConnection(socket: socketio.Socket) {
     // console.log('oldConnection', oldConnection,'oldSocket', oldSocket)
 
     
-    _cacheService.setData('users', email, scoketId)
+    // redisService.setData('users', email, scoketId)
     socket.emit('userInfo', { id: user.id, name: user.name })
     
-    const chatList = await _chatService.getChatListByUserId(user.id)
+    const chatList = await chatsService.getChatListByUserId(user.id)
 
     chatList.forEach(chat => {
-        socket.join(room.roomName(chat.id), (err: any) => { if(err) console.error(err) })
-        _cacheService.getAllMessages(chat.id)
+        socket.join(room.createName(chat.id), (err: any) => { if(err) console.error(err) })
+        redisService.getAllMessages(chat.id)
             .then(messages => socket.emit('messagesOnChat', chat.id, messages))
     })
     

@@ -1,5 +1,5 @@
 const room = {
-    roomName(chat_id: number): string { return process.env.ROOM_PREFIX + chat_id.toString(); }
+    createName: (chat_id: number) => `${process.env.ROOM_PREFIX}${chat_id}`
 }
 
 export default room;

@@ -3,13 +3,13 @@ import http from 'http';
 import express from 'express';
 
 import routes from './routes';
-import { Bootstrapper } from './bootstrapper';
+import startup from './startup';
 
 const app = express();
 
 const server = new http.Server(app);
 
-Bootstrapper(server);
+startup(server);
 
 app.use(cors());
 app.use(express.json());

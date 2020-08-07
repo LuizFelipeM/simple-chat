@@ -1,23 +1,13 @@
-import IUsersRepository from "../interfaces/repositories/IUsersRepository";
-import IUsersService from "./interfaces/IUsersService";
+import usersRepository from "../repositories/usersRepository";
 
-function usersService(userRepo: IUsersRepository): IUsersService {
+const usersService = () => {
     return {
-        async getUserInformationByEmail(email: string) {
-            const user = await userRepo.findUserInfoByEmail(email);
-            delete user.password
-            
-            return user;
-        },
+        getUserInformationByEmail: async (email: string) => await usersRepository.findUserInfoByEmail(email),
 
-        async createNewUser(name: string, email: string, password: string, imgUrl?: string) {
-            await userRepo.createUser(name, email, password, imgUrl);
-        },
+        createNewUser: (name: string, email: string, password: string, imgUrl?: string) => usersRepository.createUser(name, email, password, imgUrl),
 
-        async deleteUser(email: string) {
-            await userRepo.deleteUser(email);
-        },
+        deleteUser: (email: string) => usersRepository.deleteUser(email),
     }
 }
 
-export default usersService;
+export default usersService();

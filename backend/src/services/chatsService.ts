@@ -1,50 +1,40 @@
-import IChatsService from "./interfaces/IChatsService";
-import IChatsRepository from "../interfaces/repositories/IChatsRepository";
-import IUsersRepository from "../interfaces/repositories/IUsersRepository";
-import IUsersChatsRepository from "../interfaces/repositories/IUsersChatsRepository";
+import usersChatsRepository from "../repositories/usersChatsRepository";
+import chatsRepository from "../repositories/chatsRepository";
+import usersRepository from "../repositories/usersRepository";
 
-function chatsService(
-    usersRepo: IUsersRepository,
-    chatsRepo: IChatsRepository,
-    usersChatsRepo: IUsersChatsRepository,
-): IChatsService {
+const chatsService = () => {
 
-    async function assignUserToChatByUserId(chatId: number, userId: number) { return await usersChatsRepo.assignUserToChat(userId, chatId) }
+    const assignUserToChatByUserId = (chatId: number, userId: number) => usersChatsRepository.assignUserToChat(userId, chatId)
 
-    async function getAllChatsId() { return await chatsRepo.getAllChatsId() }
+    const getAllChatsId = async () => await chatsRepository.getAllChatsId()
 
-    async function getChatListByUserId(userId: number) {
-        const chats = await chatsRepo.getChatsByUserId(userId)
-        return chats;
-    }
+    const getChatListByUserId = async (userId: number) =>  await chatsRepository.getChatsByUserId(userId)
 
-    async function getChatListByUserEmail(email: string) {
-        const chats = await chatsRepo.getChatsByUserEmail(email)
-        return chats;
+    const getChatListByUserEmail = async (email: string) => await chatsRepository.getChatsByUserEmail(email)
+    
+    const createNewChatAndAssignToCreator = async (userId: number, chatName: string, description?: string, imgUrl?: string) => {
+        const chat =  await chatsRepository.createNewChat(chatName, description, imgUrl)
+        assignUserToChatByUserId(chat.id, userId)
     }
     
-    async function createNewChatAndAssigntoCreator(userId: number, name: string, description?: string, imgUrl?: string) {
-        const chat =  await chatsRepo.createNewChat(name, description, imgUrl);
-        await assignUserToChatByUserId(chat.id, userId);
-    }
+    const deleteChat = (id: number) => chatsRepository.deleteChat(id)
     
-    async function deleteChat(id: number) {
-        const chat = await chatsRepo.deleteChat(id);
+    const assignUserToChatByEmail = async (chatId: number, email: string) => {
+        const user = await usersRepository.findUserInfoByEmail(email)
+        usersChatsRepository.assignUserToChat(user?.id, chatId)
     }
-    
-    async function assignUserToChatByEmail(chatId: number, email: string) {
-        const user = await usersRepo.findUserInfoByEmail(email);
-        await usersChatsRepo.assignUserToChat(user?.id, chatId);
-    }
+
+    const assignUserToChatById = (chatId: number, userId: number) => usersChatsRepository.assignUserToChat(userId, chatId)
 
     return {
         getAllChatsId,
         getChatListByUserId,
         getChatListByUserEmail,
-        createNewChatAndAssigntoCreator,
+        createNewChatAndAssignToCreator,
         deleteChat,
-        assignUserToChatByEmail
+        assignUserToChatByEmail,
+        assignUserToChatById
     }
 }
 
-export default chatsService;
+export default chatsService();

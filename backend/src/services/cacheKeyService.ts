@@ -1,5 +1,6 @@
 const cacheKey = {
-    keyName(id: number | string) { return `chat:${id}` }
+    chatKeyName: (id: number | string) => `chat:${id}`,
+    generateKeyName: (key: string, id: number | string) => `${key}:${id}`
 }
 
 export default cacheKey;

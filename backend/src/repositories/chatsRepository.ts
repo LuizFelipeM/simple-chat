@@ -1,14 +1,14 @@
-import IChatsRepository from "../interfaces/repositories/IChatsRepository";
 import knex from "../database/dbConnection";
+import IChats from "../interfaces/DB data/IChats";
 
 const tableName = 'chats'
 
-const chatsRepository: IChatsRepository = {
+const chatsRepository = {
     async getAllChatsId() {
         return await knex(tableName).select('id')
     },
 
-    async getChatsByUserId(userId: number) {
+    async getChatsByUserId(userId: number): Promise<IChats[]> {
         return await knex(tableName)
             .select('*')
             .from(tableName)
@@ -20,7 +20,7 @@ const chatsRepository: IChatsRepository = {
             })
     },
 
-    async getChatsByUserEmail(email: string) {
+    async getChatsByUserEmail(email: string): Promise<IChats[]> {
         return await knex(tableName)
             .select('*')
             .from(tableName)
@@ -32,11 +32,7 @@ const chatsRepository: IChatsRepository = {
             })
     },
 
-    async createNewChat(
-        name: string,
-        description?: string,
-        imgUrl?: string
-    ) {
+    async createNewChat(name: string, description?: string, imgUrl?: string): Promise<IChats> {
         return (await knex(tableName)
             .insert({
                 name,
@@ -46,11 +42,10 @@ const chatsRepository: IChatsRepository = {
             .returning('*'))[0];
     },
 
-    async deleteChat(id: number) {
-        return (await knex(tableName)
+    deleteChat(id: number) {
+         knex(tableName)
             .where({ id })
             .del()
-            .returning('*'))[0];
     }
 }
 

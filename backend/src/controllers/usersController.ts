@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
-import { usersServ } from "../bootstrapper";
 import { ResponseDtoGen } from "../utils/helper";
 import IUsers from "../interfaces/DB data/IUsers";
+import usersService from "../services/usersService";
 
 const RespGen = new ResponseDtoGen<Omit<IUsers, 'password'>>();
 
@@ -9,7 +9,7 @@ const usersController = {
     async getUserInfo(req: Request, res: Response): Promise<Response> {
         try{
             const { email } = req.query;
-            const resp = await usersServ.getUserInformationByEmail(email.toString());
+            const resp = await usersService.getUserInformationByEmail(email.toString());
 
             return res.json(resp);
         } catch(ex) {
@@ -20,7 +20,7 @@ const usersController = {
     createUser(req: Request, res: Response): Response {
         try {
             const { name, email, password, imgUrl } = req.body;
-            usersServ.createNewUser(name, email, password, imgUrl);
+            usersService.createNewUser(name, email, password, imgUrl);
     
             return res.status(204).send();
         } catch(ex) {
@@ -31,7 +31,7 @@ const usersController = {
     deleteChat(req: Request, res: Response): Response {
         try {
             const { email } = req.params;
-            usersServ.deleteUser(email);
+            usersService.deleteUser(email);
 
             return res.status(204).send();
         } catch(ex) {

@@ -1,19 +1,19 @@
 import { Request, Response } from 'express';
 
 // import IMessageDto from '../services/interfaces/IMessageDto';
-import { cacheServ } from '../bootstrapper';
 import { ChatsContentsDto } from '../interfaces/Dtos/ChatsContentsDto';
+import redisService from '../services/redisService';
 
 const redisController = {
     async listAll(req: Request, res: Response): Promise<Response> {
-        const { key } = req.query;
-        return res.json(await cacheServ.getAllData(key.toString()));
+        const { key, id } = req.query;
+        return res.json(await redisService.getAllData(key.toString(), parseInt(String(id))));
     },
 
     async listMessages(req: Request, res: Response): Promise<Response> {
         const { chat_id } = req.query
 
-        const stringMsgs = await cacheServ.getAllMessages(Number(chat_id))
+        const stringMsgs = await redisService.getAllMessages(Number(chat_id))
         const messages = stringMsgs.map((message: string) => JSON.parse(message))
 
         return res.json(messages)
@@ -21,8 +21,9 @@ const redisController = {
 
     storeCache(req: Request, res: Response) {
         const body = req.body;
-        cacheServ.setData(
+        redisService.setData(
             body.key,
+            body.id,
             body.field,
             body.value
         );
@@ -33,7 +34,7 @@ const redisController = {
             // const message: IMessageDto = req.body
             const message: ChatsContentsDto = req.body
     
-            cacheServ.setMessage(message)
+            redisService.setMessage(message)
 
             res.status(204).send()
         } catch(error) {

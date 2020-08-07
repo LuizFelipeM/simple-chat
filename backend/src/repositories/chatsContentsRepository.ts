@@ -1,25 +1,23 @@
-import IChatsContentsRepository from "../interfaces/repositories/IChatsContentsRepository";
 import knex from "../database/dbConnection";
 import { ChatContent } from "../interfaces/Entities/ChatContent";
+import { ChatsContentsDto } from "../interfaces/Dtos/ChatsContentsDto";
 
 const tableName = 'chats_contents';
 
-const chatsContentsRepository: IChatsContentsRepository = {
-    async getMesagesFromChat(chat_id: number, limit = 15) {
+const chatsContentsRepository = {
+    getMesagesFromChat: async (chat_id: number, limit = 15): Promise<ChatsContentsDto[]> => {
         return await knex(tableName)
             .select(
-                knex.ref('users.name')
-                    .as('user_name'), 'chats_contents.*'
+                knex.ref('users.name').as('user_name'),
+                `${tableName}.*`
             )
+            .leftJoin('users', 'users.id', `${tableName}.user_id`)
             .where({ chat_id })
-            .leftJoin('users', 'users.id', 'chats_contents.user_id')
-            .orderBy('created_at', 'desc')
+            .orderBy(`${tableName}.message_sent_at`, 'asc')
             .limit(limit);
     },
 
-    async addMessagesToChats(messages: ChatContent | ChatContent[]) {
-        await knex(tableName).insert(messages);
-    }
+    addMessagesToChats: (messages: ChatContent | ChatContent[]) => knex(tableName).insert(messages)
     
     // ----- Inserting messages with JSON as main field -----
     

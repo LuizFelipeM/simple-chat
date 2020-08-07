@@ -5,12 +5,12 @@ import '../../styles/login.css';
 
 // import * as logo from '../../assets/logo-1.png'
 import { SocketContext } from '../../contexts/SocketContext';
-import { ContainerContext } from '../../contexts/ContainerContext';
+import { WrapperContext } from '../../contexts/WrapperContext';
 // const logo = '../../assets/logo-1.png'
 
 
 function Login(props: { history: H.History }){
-  const { userState, setUserState } = useContext(ContainerContext)
+  const { currentUser, setCurrentUser } = useContext(WrapperContext)
   const { login } = useContext(SocketContext)
 
   const [email, setEmail] = useState('')
@@ -29,7 +29,7 @@ function Login(props: { history: H.History }){
     //   history.push('/');
     // }
 
-    setUserState({ ...userState, ...{ email }})
+    setCurrentUser({ ...currentUser, ...{ email }})
     login(email, password)
     props.history.push('/');
   }

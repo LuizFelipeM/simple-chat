@@ -1,6 +1,6 @@
 import Message from "./Message";
 
-export default interface IChats {
+export default interface Chat {
   id: number,
   name: string,
   description: string,

@@ -39,17 +39,20 @@ function setup(): void {
 }
 
 async function handleConnection(socket: socketio.Socket) {
-    const email = socket.handshake?.query?.email
+    const email = socket.handshake?.query?.email?.toLowerCase()
     const password = socket.handshake?.query?.password
 
     const user = await usersService.getUserInformationByEmail(email)
     
     const scoketId = socket.id
 
-    const oldSocketId = await redisService.getDataByField('users', email)
-    
-    const oldConnection = io.clients().connected
-    oldConnection[oldSocketId]?.disconnect()
+    // const oldSocketId = await _cacheService.getDataByField('users', email)
+    // console.log('oldSocketId', oldSocketId, 'scoketId', scoketId)
+
+    // const oldConnection = io.clients()
+    // const oldSocket = oldConnection[oldSocketId]
+
+    // console.log('oldConnection', oldConnection,'oldSocket', oldSocket)
 
     
     // redisService.setData('users', email, scoketId)
@@ -62,6 +65,7 @@ async function handleConnection(socket: socketio.Socket) {
         redisService.getAllMessages(chat.id)
             .then(messages => socket.emit('messagesOnChat', chat.id, messages))
     })
+    
     socket.emit('chatList', chatList)
     //socket.emit('message', message));
 }

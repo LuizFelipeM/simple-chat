@@ -1,51 +1,69 @@
-
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import socketio from 'socket.io-client'
 
-import IChats from '../interfaces/IChats';
-import Message from '../interfaces/Message';
-import UserState from './UserState';
-import { ContainerContext } from './ContainerContext';
+import Chat from '../interfaces/Chat'
+import Message from '../interfaces/Message'
+import UserState from './UserState'
+import { WrapperContext } from './WrapperContext'
+import ChatDto from '../interfaces/ChatDto'
+import MessageDto from '../interfaces/MessagesDto'
 
 type SocketContextType = {
-  chats: IChats[]
-  setChats: React.Dispatch<React.SetStateAction<IChats[]>>
   login: (email: string, password: string) => void
   sendMessage: (content: Message) => void
+  messages: MessageDto
+  setMessages: React.Dispatch<React.SetStateAction<MessageDto>>
 }
 
-const SocketContext = createContext<SocketContextType>({ chats: [], setChats: () => {}, login: () => {}, sendMessage: (content: Message) => {} })
+const initialContext = {
+  login: () => {},
+  sendMessage: () => {},
+  messages: {},
+  setMessages: () => {},
+}
+
+const SocketContext = createContext<SocketContextType>(initialContext)
 
 const SocketProvider = (props: { children: JSX.Element }) => {
-  // const { userState, setUserState } = useContext(UserContext)
-  const { chats, setChats, userState, setUserState } = useContext(ContainerContext)
-
-  const [socket] = useState(socketio('http://localhost:8080', { autoConnect: false }))
+  const { setChats, currentUser, setCurrentUser } = useContext(WrapperContext)
   
-  socket.on('chatList', setChats)
-  socket.on('userInfo', (data: Pick<UserState, 'name' | 'id'>) => setUserState({ ...userState, ...data }))
+  const [messages, setMessages] = useState<MessageDto>({})
+  const [socket] = useState(socketio('http://localhost:8080', {
+    autoConnect: false
+  }))
 
-  socket.on('message', (content: Message) => {
-    const chatsWithMessages = chats.map(chat => {
-      if(chat.id === content.chat_id)
-        return { ...chat, ...{ messages: chat?.messages?.length ? [...chat.messages, content] : [content]} }
-      return chat
-    })
+  useEffect(() => {
+    removeSocketListeners()
+    return removeSocketListeners()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket])
 
-    setChats(chatsWithMessages)
+  function removeSocketListeners() {
+    socket.off('message')
+    socket.off('messagesOnChat')
+    socket.off('userInfo')
+    socket.off('chatList')
+  }
+  
+  socket.on('chatList', handleChatList)
+  socket.on('userInfo', (data: Pick<UserState, 'name' | 'id'>) => setCurrentUser({ ...currentUser, ...data }))
+
+  socket.on('message', handleMessage)
+
+  socket.on('messagesOnChat', (chatId: string, incomingMessages: Message[]) => {
+    const newMessages = Object.assign({}, messages, { [chatId]: incomingMessages })
+
+    setMessages(newMessages)
   })
 
-  socket.on('messagesOnChat', (chatId: string, messages: Message[]) => {
-    const id = parseInt(chatId)
+  function handleMessage(content: Message){
+    socket.off('message')
+    const messageArr = [...( messages[content.chat_id] ? messages[content.chat_id] : [] ), content]
 
-    const chatsWithMessages = chats.map(chat => {
-      if(chat.id == id)
-        return { ...chat, ...{ messages } }
-      return chat
-    })
+    console.log('handleMessage', messageArr)
 
-    setChats(chatsWithMessages)
-  })
+    setMessages(Object.assign({}, messages, { [content.chat_id]: messageArr }))
+  }
 
   const sendMessage = (content: Message) => socket.emit('message', content)
 
@@ -56,48 +74,28 @@ const SocketProvider = (props: { children: JSX.Element }) => {
     socket.connect()
   }
 
+  function handleChatList(chatList: Chat[]) {
+    const chatsTest: ChatDto = {}
 
-  // const getUserChatList = (setChat: (chatList: IChats[]) => void) => {
-  //   const userId = parseInt(sessionStorage.getItem('userId') as string)
+    chatList.forEach(chat => {
+      const { id, ...chatContent } = chat
 
-  //   socket.emit('getChatList', { userId })
-  // }
+      Object.assign(chatsTest, { [id]: chatContent })
+    })
+
+    setChats(chatsTest)
+  }
 
   return (
-    <SocketContext.Provider value={{ chats, setChats, login, sendMessage }}>
+    <SocketContext.Provider value={{
+      login,
+      sendMessage,
+      messages,
+      setMessages
+    }}>
       {props.children}
     </SocketContext.Provider>
   )
 }
-
-// function socketService() {
-  
-//   function setupWebSocket(email: string, password: string){
-//     disconnect();
-    
-//     socket.io.opts.query = { email, password }
-//     socket.connect();
-    
-//     socket.on('message', (data: Message) => {})
-//   }
-  
-//   function disconnect(){
-//     if(socket.connected)
-//       socket.disconnect();
-//   }
-  
-//   const sendMessage = (content: Message) => socket.emit('message', content)
-
-  
-
-//   const isConnected = socket.connected
-
-//   return {
-//     sendMessage,
-//     setupWebSocket,
-//     getUserChatList,
-//     isConnected
-//   }
-// }
 
 export { SocketContext, SocketProvider }

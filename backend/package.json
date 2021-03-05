@@ -50,7 +50,7 @@
     "@types/dotenv-safe": "^8.1.1",
     "@types/express": "^4.17.7",
     "@types/jsonwebtoken": "^8.5.0",
-    "@types/pg": "^7.14.4",
+    "@types/pg": "^7.14.11",
     "@types/socket.io": "^2.1.10",
     "@types/redis": "^2.8.25",
     "nodemon": "^2.0.4",
